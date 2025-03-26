@@ -1,2 +1,2 @@
-1..100 | ForEach-Object { Invoke-WebRequest -Uri "http://localhost:3000/least-connection" } 
+1..100 | ForEach-Object { Invoke-WebRequest -Uri "http://localhost:3000/balance-request" }
 for sending 100 requets to the server.
