@@ -51,7 +51,7 @@ app.get("/round-robin", async (req, res) => {
 });
 
 // Least Connections Load Balancing
-app.get("/least-connections", async (req, res) => {
+app.get("/least-connection", async (req, res) => {
   const server = backendServers.reduce((prev, curr) =>
     prev.connections < curr.connections ? prev : curr
   );
