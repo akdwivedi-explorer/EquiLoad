@@ -1,47 +1,99 @@
-// app/dashboard/page.tsx (Real-Time Server Monitoring)
 "use client";
-import { useEffect, useState } from "react";
-import { create } from "zustand";
 
-interface ServerData {
-  url: string;
-  connections: number;
-}
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-const useServerStore = create<{ servers: string[]; strategy: string }>(
-  (set) => ({
-    servers: [],
-    strategy: "round-robin",
-  })
-);
+export default function InputPage() {
+  const [serverInputs, setServerInputs] = useState<string[]>([""]);
+  const [strategy, setStrategy] = useState<string>("round-robin");
+  const router = useRouter();
 
-export default function Dashboard() {
-  const { servers, strategy } = useServerStore();
-  const [serverStats, setServerStats] = useState<ServerData[]>([]);
+  const handleServerChange = (index: number, value: string) => {
+    const newInputs = [...serverInputs];
+    newInputs[index] = value;
+    setServerInputs(newInputs);
+  };
 
-  useEffect(() => {
-    const ws = new WebSocket("ws://localhost:3000");
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.servers) {
-        setServerStats(data.servers);
+  const addServerInput = () => {
+    setServerInputs([...serverInputs, ""]);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const servers = serverInputs.filter((url) => url.trim() !== "");
+    if (servers.length === 0) {
+      alert("Please add at least one server");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:3000/api/configure", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ servers, strategy }),
+      });
+      if (response.ok) {
+        router.push("/dashboard");
+      } else {
+        alert("Failed to configure servers");
       }
-    };
-    return () => ws.close();
-  }, []);
+    } catch (error) {
+      console.error("Error submitting configuration:", error);
+      alert("Error submitting configuration");
+    }
+  };
 
   return (
-    <div className="p-6 max-w-lg mx-auto ">
-      <h1 className="text-2xl font-bold mb-4">Server Load Dashboard</h1>
-      <h2 className="text-lg">Current Strategy: {strategy}</h2>
-      <ul className="mt-4">
-        {serverStats.map((server, index) => (
-          <li key={index} className="border-b py-2 flex justify-between">
-            <span>{server.url}</span>
-            <span>Connections: {server.connections}</span>
-          </li>
-        ))}
-      </ul>
+    <div className="container mx-auto max-w-2xl p-6">
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">
+        Configure Load Balancer
+      </h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-gray-700 font-semibold mb-2">
+            Backend Servers
+          </label>
+          {serverInputs.map((server, index) => (
+            <input
+              key={index}
+              type="text"
+              value={server}
+              onChange={(e) => handleServerChange(index, e.target.value)}
+              placeholder={`Server URL (e.g., http://localhost:400${index})`}
+              className="w-full p-2 mb-2 border rounded-md"
+            />
+          ))}
+          <button
+            type="button"
+            onClick={addServerInput}
+            className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+          >
+            Add Server
+          </button>
+        </div>
+
+        <div>
+          <label className="block text-gray-700 font-semibold mb-2">
+            Load Balancing Strategy
+          </label>
+          <select
+            value={strategy}
+            onChange={(e) => setStrategy(e.target.value)}
+            className="w-full p-2 border rounded-md"
+          >
+            <option value="round-robin">Round Robin</option>
+            <option value="least-connection">Least Connection</option>
+            <option value="ip-hashing">IP Hashing</option>
+          </select>
+        </div>
+
+        <button
+          type="submit"
+          className="w-full py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+        >
+          Save Configuration
+        </button>
+      </form>
     </div>
   );
 }
