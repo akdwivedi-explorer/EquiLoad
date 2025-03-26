@@ -2,28 +2,38 @@ const http = require("http");
 const express = require("express");
 const axios = require("axios");
 const WebSocket = require("ws");
+const cors = require("cors");
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-const backendServers = [
+app.use(
+  cors({
+    origin: "http://localhost:3001",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
+
+app.use(express.json());
+
+let backendServers = [
   { url: "http://localhost:4000", connections: 0 },
   { url: "http://localhost:4001", connections: 0 },
   { url: "http://localhost:4002", connections: 0 },
 ];
-
+let currentStrategy = "round-robin";
 let currentServerIndex = 0;
 
-// Function to send real-time updates to frontend
 const sendUpdates = () => {
   const data = JSON.stringify({
     servers: backendServers.map((server) => ({
       url: server.url,
       connections: server.connections,
     })),
+    strategy: currentStrategy,
   });
-
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
       client.send(data);
@@ -31,32 +41,75 @@ const sendUpdates = () => {
   });
 };
 
-// Round Robin Load Balancing
-app.get("/round-robin", async (req, res) => {
-  const server = backendServers[currentServerIndex];
-  currentServerIndex = (currentServerIndex + 1) % backendServers.length;
-
+// Validate URL format
+const isValidUrl = (url) => {
   try {
-    server.connections++; // Increase count
-    sendUpdates(); // Send live update
-
-    const response = await axios.get(server.url);
-    server.connections--; // Decrease count after response
-    sendUpdates(); // Update frontend again
-
-    res.send(`Round Robin -> ${response.data}`);
-  } catch (error) {
-    res.status(500).send("Backend server error");
+    new URL(url);
+    return url.startsWith("http://") || url.startsWith("https://");
+  } catch {
+    return false;
   }
+};
+
+app.post("/api/configure", (req, res) => {
+  const { servers, strategy } = req.body;
+  if (!servers || !Array.isArray(servers) || !strategy) {
+    return res
+      .status(400)
+      .send(
+        "Invalid input: servers must be an array and strategy must be provided"
+      );
+  }
+
+  const validServers = servers.filter((url) => isValidUrl(url));
+  if (validServers.length === 0) {
+    return res.status(400).send("No valid server URLs provided");
+  }
+
+  backendServers = validServers.map((url) => ({ url, connections: 0 }));
+  currentStrategy = strategy;
+  currentServerIndex = 0;
+  console.log("Servers reconfigured:", backendServers);
+  sendUpdates();
+  res.send("Configuration updated");
 });
 
-// Least Connections Load Balancing
-app.get("/least-connection", async (req, res) => {
-  const server = backendServers.reduce((prev, curr) =>
-    prev.connections < curr.connections ? prev : curr
-  );
+app.get("/api/current-config", (req, res) => {
+  res.json({ servers: backendServers, strategy: currentStrategy });
+});
 
+const ipHash = (clientIp) => {
+  const hash = clientIp
+    .split(".")
+    .reduce((acc, val) => acc + parseInt(val, 10), 0);
+  return hash % backendServers.length;
+};
+
+app.get("/balance-request", async (req, res) => {
+  let server;
   try {
+    if (backendServers.length === 0) {
+      throw new Error("No backend servers configured");
+    }
+
+    if (currentStrategy === "round-robin") {
+      server = backendServers[currentServerIndex];
+      currentServerIndex = (currentServerIndex + 1) % backendServers.length;
+    } else if (currentStrategy === "least-connection") {
+      server = backendServers.reduce((prev, curr) =>
+        prev.connections < curr.connections ? prev : curr
+      );
+    } else if (currentStrategy === "ip-hashing") {
+      const clientIp = req.ip || "127.0.0.1";
+      const serverIndex = ipHash(clientIp);
+      server = backendServers[serverIndex];
+    }
+
+    if (!server || !isValidUrl(server.url)) {
+      throw new Error(`Invalid server URL: ${server?.url || "undefined"}`);
+    }
+
+    console.log(`Request routed to ${server.url} using ${currentStrategy}`);
     server.connections++;
     sendUpdates();
 
@@ -64,13 +117,17 @@ app.get("/least-connection", async (req, res) => {
     server.connections--;
     sendUpdates();
 
-    res.send(`Least Connections -> ${response.data}`);
+    res.send(`${currentStrategy.replace("-", " ")} -> ${response.data}`);
   } catch (error) {
-    res.status(500).send("Backend server error");
+    server && server.connections--;
+    sendUpdates();
+    console.error(
+      `Error contacting ${server?.url || "unknown server"}: ${error.message}`
+    );
+    res.status(500).send(`Backend server error: ${error.message}`);
   }
 });
 
-// WebSocket Connection
 wss.on("connection", (ws) => {
   ws.send(JSON.stringify({ message: "Connected to WebSocket!" }));
 });
