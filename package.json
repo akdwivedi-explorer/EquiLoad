@@ -14,7 +14,8 @@
     "axios": "^1.8.4",
     "concurrently": "^9.1.2",
     "express": "^4.21.2",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "ws": "^8.18.1"
   },
   "devDependencies": {
     "cross-env": "^7.0.3"

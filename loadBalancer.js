@@ -1,56 +1,80 @@
-const express = require("express");
 const http = require("http");
-const socketIo = require("socket.io");
+const express = require("express");
 const axios = require("axios");
+const WebSocket = require("ws");
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const wss = new WebSocket.Server({ server });
 
-const servers = ["http://localhost:4000", "http://localhost:4001"];
+const backendServers = [
+  { url: "http://localhost:4000", connections: 0 },
+  { url: "http://localhost:4001", connections: 0 },
+  { url: "http://localhost:4002", connections: 0 },
+];
+
 let currentServerIndex = 0;
-let serverConnections = servers.map(() => 0);
 
-app.use(express.static("public"));
+// Function to send real-time updates to frontend
+const sendUpdates = () => {
+  const data = JSON.stringify({
+    servers: backendServers.map((server) => ({
+      url: server.url,
+      connections: server.connections,
+    })),
+  });
 
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(data);
+    }
+  });
+};
+
+// Round Robin Load Balancing
 app.get("/round-robin", async (req, res) => {
-  let server = servers[currentServerIndex];
-  currentServerIndex = (currentServerIndex + 1) % servers.length;
+  const server = backendServers[currentServerIndex];
+  currentServerIndex = (currentServerIndex + 1) % backendServers.length;
 
   try {
-    const response = await axios.get(server);
-    io.emit("update", { method: "Round Robin", server });
+    server.connections++; // Increase count
+    sendUpdates(); // Send live update
+
+    const response = await axios.get(server.url);
+    server.connections--; // Decrease count after response
+    sendUpdates(); // Update frontend again
+
     res.send(`Round Robin -> ${response.data}`);
   } catch (error) {
-    res.status(500).send("Server Error");
+    res.status(500).send("Backend server error");
   }
 });
 
+// Least Connections Load Balancing
 app.get("/least-connections", async (req, res) => {
-  let minIndex = serverConnections.indexOf(Math.min(...serverConnections));
-  serverConnections[minIndex]++;
+  const server = backendServers.reduce((prev, curr) =>
+    prev.connections < curr.connections ? prev : curr
+  );
 
   try {
-    const response = await axios.get(servers[minIndex]);
+    server.connections++;
+    sendUpdates();
 
-    setTimeout(() => {
-      serverConnections[minIndex]--;
-      io.emit("update", {
-        method: "Least Connections",
-        server: servers[minIndex],
-        activeConnections: [...serverConnections],
-      });
-    }, 1000);
+    const response = await axios.get(server.url);
+    server.connections--;
+    sendUpdates();
 
     res.send(`Least Connections -> ${response.data}`);
   } catch (error) {
-    serverConnections[minIndex]--;
-    res.status(500).send("Server Error");
+    res.status(500).send("Backend server error");
   }
 });
 
-io.on("connection", (socket) => {
-  console.log("New client connected");
+// WebSocket Connection
+wss.on("connection", (ws) => {
+  ws.send(JSON.stringify({ message: "Connected to WebSocket!" }));
 });
 
-server.listen(3000, () => console.log("Load Balancer running on port 3000"));
+server.listen(3000, () => {
+  console.log("Load Balancer running on port 3000");
+});
