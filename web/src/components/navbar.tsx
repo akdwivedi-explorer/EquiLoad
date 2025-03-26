@@ -35,7 +35,7 @@ export function Navbar() {
             Documentation
           </Link>
           <Button asChild>
-            <Link href="#get-started">Get Started</Link>
+            <Link href="/input">Get Started</Link>
           </Button>
         </nav>
 
