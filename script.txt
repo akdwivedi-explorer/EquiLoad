@@ -1,0 +1,1 @@
+"1..100 | ForEach-Object { Invoke-WebRequest -Uri "http://localhost:3000/round-robin" }" for sending 100 requets to the server.

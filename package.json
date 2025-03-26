@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:backend": "concurrently \"cross-env PORT=4000 node backend.js\" \"cross-env PORT=4001 node backend.js\" \"cross-env PORT=4002 node backend.js\""
   },
   "keywords": [],
   "author": "",
@@ -11,6 +12,11 @@
   "description": "",
   "dependencies": {
     "axios": "^1.8.4",
-    "express": "^4.21.2"
+    "concurrently": "^9.1.2",
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
   }
 }

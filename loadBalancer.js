@@ -1,67 +1,56 @@
 const express = require("express");
+const http = require("http");
+const socketIo = require("socket.io");
 const axios = require("axios");
 
 const app = express();
-const PORT = 3000;
+const server = http.createServer(app);
+const io = socketIo(server);
 
-// List of backend servers
-const servers = [
-  "http://localhost:4000",
-  "http://localhost:4001",
-  "http://localhost:4002",
-];
+const servers = ["http://localhost:4000", "http://localhost:4001"];
 let currentServerIndex = 0;
-const serverConnections = servers.map(() => 0);
+let serverConnections = servers.map(() => 0);
 
-const crypto = require("crypto");
+app.use(express.static("public"));
 
-// Round Robin Algorithm
 app.get("/round-robin", async (req, res) => {
-  const server = servers[currentServerIndex];
+  let server = servers[currentServerIndex];
   currentServerIndex = (currentServerIndex + 1) % servers.length;
 
   try {
     const response = await axios.get(server);
+    io.emit("update", { method: "Round Robin", server });
     res.send(`Round Robin -> ${response.data}`);
   } catch (error) {
     res.status(500).send("Server Error");
   }
 });
 
-// Least Connections Algorithm
 app.get("/least-connections", async (req, res) => {
   let minIndex = serverConnections.indexOf(Math.min(...serverConnections));
-  serverConnections[minIndex]++; // Increase active connections
+  serverConnections[minIndex]++;
 
   try {
     const response = await axios.get(servers[minIndex]);
 
-    // Simulate request taking time before decreasing count
     setTimeout(() => {
       serverConnections[minIndex]--;
-    }, 1000); // Adjust timing as needed
+      io.emit("update", {
+        method: "Least Connections",
+        server: servers[minIndex],
+        activeConnections: [...serverConnections],
+      });
+    }, 1000);
 
     res.send(`Least Connections -> ${response.data}`);
   } catch (error) {
-    serverConnections[minIndex]--; // Decrease if request fails
+    serverConnections[minIndex]--;
     res.status(500).send("Server Error");
   }
 });
 
-// IP Hashing Algorithm
-app.get("/ip-hash", async (req, res) => {
-  const ip = req.ip || "127.0.0.1";
-  const hash = crypto.createHash("md5").update(ip).digest("hex");
-  const serverIndex = parseInt(hash, 16) % servers.length;
-
-  try {
-    const response = await axios.get(servers[serverIndex]);
-    res.send(`IP Hashing -> ${response.data}`);
-  } catch (error) {
-    res.status(500).send("Server Error");
-  }
+io.on("connection", (socket) => {
+  console.log("New client connected");
 });
 
-app.listen(PORT, () => {
-  console.log(`Load Balancer running on port ${PORT}`);
-});
+server.listen(3000, () => console.log("Load Balancer running on port 3000"));

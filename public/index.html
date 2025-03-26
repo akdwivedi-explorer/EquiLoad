@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Load Balancer Dashboard</title>
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
+  <body>
+    <h1>Load Balancer Dashboard</h1>
+    <div id="log"></div>
+
+    <script>
+      const socket = io();
+
+      socket.on("update", (data) => {
+        const logDiv = document.getElementById("log");
+        let newLog = document.createElement("p");
+        newLog.innerText = `${data.method} -> ${data.server}`;
+        logDiv.prepend(newLog);
+      });
+    </script>
+  </body>
+</html>
