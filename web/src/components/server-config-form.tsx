@@ -152,6 +152,7 @@ export function ServerConfigForm() {
                       Least Connections
                     </SelectItem>
                     <SelectItem value="ip-hashing">IP Hash</SelectItem>
+                    <SelectItem value="ml-model">ML Based</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button type="submit" className="w-full mt-4">

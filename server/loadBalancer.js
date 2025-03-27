@@ -25,6 +25,7 @@ let backendServers = [
 ];
 let currentStrategy = "round-robin";
 let currentServerIndex = 0;
+const ML_API_URL = "http://localhost:5000/predict"; // Replace with actual ML API endpoint
 
 const sendUpdates = () => {
   const data = JSON.stringify({
@@ -41,7 +42,6 @@ const sendUpdates = () => {
   });
 };
 
-// Validate URL format
 const isValidUrl = (url) => {
   try {
     new URL(url);
@@ -85,6 +85,19 @@ const ipHash = (clientIp) => {
   return hash % backendServers.length;
 };
 
+const getMLPrediction = async () => {
+  try {
+    const data = Array(12).fill(1); // Generate array with 12 values all set to 1
+    const response = await axios.post("http://127.0.0.1:8000/predict", {
+      input: data,
+    });
+    return response.data.server_index - 1; // Convert 1-based index to 0-based
+  } catch (error) {
+    console.error("ML Model Error:", error.message);
+    return 0; // Default to the first server in case of an error
+  }
+};
+
 app.get("/balance-request", async (req, res) => {
   let server;
   try {
@@ -102,6 +115,9 @@ app.get("/balance-request", async (req, res) => {
     } else if (currentStrategy === "ip-hashing") {
       const clientIp = req.ip || "127.0.0.1";
       const serverIndex = ipHash(clientIp);
+      server = backendServers[serverIndex];
+    } else if (currentStrategy === "ml-model") {
+      const serverIndex = await getMLPrediction();
       server = backendServers[serverIndex];
     }
 
