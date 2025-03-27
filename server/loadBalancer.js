@@ -25,12 +25,29 @@ let backendServers = [
 ];
 let currentStrategy = "round-robin";
 let currentServerIndex = 0;
+const ML_API_URL = "http://127.0.0.1:8000/predict";
+
+const getRandomFloat = (min, max) =>
+  (Math.random() * (max - min) + min).toFixed(2);
+const getRandomInt = (min, max) =>
+  Math.floor(Math.random() * (max - min)) + min;
+
+const generateServerMetrics = (port) => {
+  return {
+    server: `http://localhost:${port}`,
+    cpu: getRandomFloat(1.5, 13),
+    memory: getRandomFloat(70, 90),
+    activeConnections: getRandomInt(1, 10),
+    responseTime: getRandomInt(50, 200),
+  };
+};
 
 const sendUpdates = () => {
   const data = JSON.stringify({
     servers: backendServers.map((server) => ({
       url: server.url,
       connections: server.connections,
+      metrics: generateServerMetrics(new URL(server.url).port),
     })),
     strategy: currentStrategy,
   });
@@ -41,7 +58,6 @@ const sendUpdates = () => {
   });
 };
 
-// Validate URL format
 const isValidUrl = (url) => {
   try {
     new URL(url);
@@ -85,6 +101,28 @@ const ipHash = (clientIp) => {
   return hash % backendServers.length;
 };
 
+const getMLPrediction = async () => {
+  try {
+    const data = backendServers
+      .flatMap((server) => {
+        const metrics = generateServerMetrics(new URL(server.url).port);
+        return [
+          metrics.cpu,
+          metrics.memory,
+          metrics.activeConnections,
+          metrics.responseTime,
+        ];
+      })
+      .slice(0, 12); // Ensure only 12 values are sent
+
+    const response = await axios.post(ML_API_URL, { input: data });
+    return response.data.server_index - 1; // Convert 1-based index to 0-based
+  } catch (error) {
+    console.error("ML Model Error:", error.message);
+    return 0; // Default to the first server in case of an error
+  }
+};
+
 app.get("/balance-request", async (req, res) => {
   let server;
   try {
@@ -102,6 +140,9 @@ app.get("/balance-request", async (req, res) => {
     } else if (currentStrategy === "ip-hashing") {
       const clientIp = req.ip || "127.0.0.1";
       const serverIndex = ipHash(clientIp);
+      server = backendServers[serverIndex];
+    } else if (currentStrategy === "ml-model") {
+      const serverIndex = await getMLPrediction();
       server = backendServers[serverIndex];
     }
 
