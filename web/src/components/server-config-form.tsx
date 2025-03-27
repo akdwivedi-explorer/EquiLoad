@@ -44,11 +44,12 @@ export function ServerConfigForm() {
     setServerInputs(serverInputs.filter((_, i) => i !== index));
   };
 
-  interface HandleAiButtonClickEvent extends React.MouseEvent<HTMLButtonElement> {}
+  interface HandleAiButtonClickEvent
+    extends React.MouseEvent<HTMLButtonElement> {}
 
   const handleAiButtonClcik = (e: HandleAiButtonClickEvent): void => {
     e.preventDefault();
-    router.push('/generate');
+    router.push("/generate");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -123,14 +124,22 @@ export function ServerConfigForm() {
               <Plus className="h-4 w-4 mr-2" />
               Add Another Server
             </Button>
-            <Button
-              type="button"
-              className="w-1/2 mt-4"
-              onClick={() => setActiveTab("algorithm")}
-            >
-              Select Algorithm
-            </Button>
-            <Button type="button" className="w-1/2 mt-4 text-left" onClick={handleAiButtonClcik}>Ask to AI</Button>
+            <div className="flex gap-4">
+              <Button
+                type="button"
+                className="w-1/2 mt-4"
+                onClick={() => setActiveTab("algorithm")}
+              >
+                Select Algorithm
+              </Button>
+              <Button
+                type="button"
+                className="w-1/2 mt-4 text-left"
+                onClick={handleAiButtonClcik}
+              >
+                Ask to AI
+              </Button>
+            </div>
             {activeTab === "algorithm" && (
               <>
                 <Select value={strategy} onValueChange={setStrategy}>
