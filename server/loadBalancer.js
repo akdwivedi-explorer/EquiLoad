@@ -107,19 +107,24 @@ const getMLPrediction = async () => {
       .flatMap((server) => {
         const metrics = generateServerMetrics(new URL(server.url).port);
         return [
-          metrics.cpu,
-          metrics.memory,
-          metrics.activeConnections,
-          metrics.responseTime,
+          parseFloat(metrics.cpu), // Convert to float
+          parseFloat(metrics.memory), // Convert to float
+          parseInt(metrics.activeConnections), // Convert to int
+          parseInt(metrics.responseTime), // Convert to int
         ];
       })
-      .slice(0, 12); // Ensure only 12 values are sent
+      .slice(0, 12); // Ensure exactly 12 values are sent
 
-    const response = await axios.post(ML_API_URL, { input: data });
-    return response.data.server_index - 1; // Convert 1-based index to 0-based
+    console.log("Sending data to ML Model:", JSON.stringify(data));
+
+    const response = await axios.post(ML_API_URL, data, {
+      headers: { "Content-Type": "application/json" }, // Ensure proper content type
+    });
+
+    return response.data.prediction - 1; // Convert 1-based index to 0-based
   } catch (error) {
-    console.error("ML Model Error:", error.message);
-    return 0; // Default to the first server in case of an error
+    console.error("ML Model Error:", error.response?.data || error.message);
+    return 0; // Default to first server if there's an error
   }
 };
 
@@ -160,7 +165,7 @@ app.get("/balance-request", async (req, res) => {
 
     res.send(`${currentStrategy.replace("-", " ")} -> ${response.data}`);
   } catch (error) {
-    server && server.connections--;
+    if (server) server.connections--;
     sendUpdates();
     console.error(
       `Error contacting ${server?.url || "unknown server"}: ${error.message}`

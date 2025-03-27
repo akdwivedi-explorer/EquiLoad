@@ -64,7 +64,7 @@ async def predict(data: List[float]):
     # Make prediction
     prediction = model.predict(X)
     temp=prediction.tolist()[0]
-    if(temp<=1):
+    if(temp<=1.5):
         temp=1
     elif(temp<=2):
         temp=2
