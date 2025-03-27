@@ -5,6 +5,7 @@ EquiLoad is an intelligent, AI-assisted load balancer that optimizes traffic dis
 ## Features
 
 - **Custom Backend Configuration**: Users can input their backend server URLs.
+- **Very Easy Onboarding**: Very convinent for begginers.
 - **Algorithm Selection**: Choose from multiple load-balancing algorithms.
 - **AI Assistance**: If unsure about an algorithm, users can consult AI for recommendations.
 - **ML-Based Prediction**: The system intelligently assigns requests using a machine learning model that considers:
@@ -40,14 +41,12 @@ EquiLoad is an intelligent, AI-assisted load balancer that optimizes traffic dis
 
 - **Round Robin**: Distributes requests sequentially.
 - **Least Connections**: Directs traffic to the server with the fewest active connections.
-- **Weighted Round Robin**: Assigns weight to servers based on capacity.
-- **Response Time-Based**: Prefers servers with the fastest response time.
 - **AI-Assisted Recommendation**: Suggests the best algorithm based on workload.
 
 ## Tech Stack
 
 - **Backend**: Node.js, Express.js
-- **Frontend**: React.js
+- **Frontend**: Next.js, TypeScript, Tailwind CSS
 - **Machine Learning**: Python, TensorFlow/Scikit-Learn (for prediction model)
 
 ## Contributing
