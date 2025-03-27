@@ -104,6 +104,12 @@ export default function DashboardPage() {
       </div>
 
       <div className="space-y-4">
+        <button
+          onClick={sendRequest}
+          className="w-full py-3 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+        >
+          Send Request
+        </button>
         {lastResponse && (
           <div className="bg-gray-100 p-4 rounded-md border border-gray-200">
             <h3 className="font-semibold mb-2">Last Response:</h3>
