@@ -95,7 +95,7 @@ app.get("/balance-request", async (req, res) => {
     if (currentStrategy === "round-robin") {
       server = backendServers[currentServerIndex];
       currentServerIndex = (currentServerIndex + 1) % backendServers.length;
-    } else if (currentStrategy === "least-connection") {
+    } else if (currentStrategy === "least-connections") {
       server = backendServers.reduce((prev, curr) =>
         prev.connections < curr.connections ? prev : curr
       );

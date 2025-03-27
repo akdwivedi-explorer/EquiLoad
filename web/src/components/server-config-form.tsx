@@ -44,11 +44,12 @@ export function ServerConfigForm() {
     setServerInputs(serverInputs.filter((_, i) => i !== index));
   };
 
-  interface HandleAiButtonClickEvent extends React.MouseEvent<HTMLButtonElement> {}
+  interface HandleAiButtonClickEvent
+    extends React.MouseEvent<HTMLButtonElement> {}
 
   const handleAiButtonClcik = (e: HandleAiButtonClickEvent): void => {
     e.preventDefault();
-    router.push('/generate');
+    router.push("/generate");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -123,20 +124,25 @@ export function ServerConfigForm() {
               <Plus className="h-4 w-4 mr-2" />
               Add Another Server
             </Button>
-            <Button
-              type="button"
-              className="w-1/2 mt-4"
-              onClick={() => setActiveTab("algorithm")}
-            >
-              Select Algorithm
-            </Button>
-            <Button type="button" className="w-1/2 mt-4 text-left" onClick={handleAiButtonClcik}>Ask to AI</Button>
+            <div className="flex gap-4">
+              <Button
+                type="button"
+                className="w-1/2 mt-4"
+                onClick={() => setActiveTab("algorithm")}
+              >
+                Select Algorithm
+              </Button>
+              <Button
+                type="button"
+                className="w-1/2 mt-4 text-left"
+                onClick={handleAiButtonClcik}
+              >
+                Ask to AI
+              </Button>
+            </div>
             {activeTab === "algorithm" && (
               <>
-                <Select
-                  value={strategy}
-                  onValueChange={setStrategy}
-                >
+                <Select value={strategy} onValueChange={setStrategy}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select algorithm" />
                   </SelectTrigger>
@@ -145,7 +151,7 @@ export function ServerConfigForm() {
                     <SelectItem value="least-connections">
                       Least Connections
                     </SelectItem>
-                    <SelectItem value="ip-hash">IP Hash</SelectItem>
+                    <SelectItem value="ip-hashing">IP Hash</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button type="submit" className="w-full mt-4">
@@ -165,27 +171,74 @@ export function ServerConfigForm() {
               {strategy === "round-robin"
                 ? "Traffic is distributed sequentially across servers"
                 : strategy === "least-connections"
-                  ? "Traffic is sent to servers with fewer active connections"
-                  : "Traffic from the same client IP always goes to the same server"}
+                ? "Traffic is sent to servers with fewer active connections"
+                : "Traffic from the same client IP always goes to the same server"}
             </p>
           </div>
         </div>
 
         {/* Animated visualization based on selected algorithm */}
         <div className="absolute inset-0 opacity-20">
-          <svg width="100%" height="100%" viewBox="0 0 800 200" xmlns="http://www.w3.org/2000/svg">
+          <svg
+            width="100%"
+            height="100%"
+            viewBox="0 0 800 200"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             {/* Central load balancer */}
-            <circle cx="400" cy="100" r="20" fill="currentColor" className="text-primary" />
+            <circle
+              cx="400"
+              cy="100"
+              r="20"
+              fill="currentColor"
+              className="text-primary"
+            />
 
             {/* Server nodes */}
-            <circle cx="600" cy="50" r="15" fill="currentColor" className="text-primary/70" />
-            <circle cx="600" cy="100" r="15" fill="currentColor" className="text-primary/70" />
-            <circle cx="600" cy="150" r="15" fill="currentColor" className="text-primary/70" />
+            <circle
+              cx="600"
+              cy="50"
+              r="15"
+              fill="currentColor"
+              className="text-primary/70"
+            />
+            <circle
+              cx="600"
+              cy="100"
+              r="15"
+              fill="currentColor"
+              className="text-primary/70"
+            />
+            <circle
+              cx="600"
+              cy="150"
+              r="15"
+              fill="currentColor"
+              className="text-primary/70"
+            />
 
             {/* Client nodes */}
-            <circle cx="200" cy="50" r="10" fill="currentColor" className="text-primary/70" />
-            <circle cx="200" cy="100" r="10" fill="currentColor" className="text-primary/70" />
-            <circle cx="200" cy="150" r="10" fill="currentColor" className="text-primary/70" />
+            <circle
+              cx="200"
+              cy="50"
+              r="10"
+              fill="currentColor"
+              className="text-primary/70"
+            />
+            <circle
+              cx="200"
+              cy="100"
+              r="10"
+              fill="currentColor"
+              className="text-primary/70"
+            />
+            <circle
+              cx="200"
+              cy="150"
+              r="10"
+              fill="currentColor"
+              className="text-primary/70"
+            />
 
             {/* Connection lines */}
             <line
@@ -245,32 +298,128 @@ export function ServerConfigForm() {
             />
 
             {/* Animated dots for traffic */}
-            <circle cx="300" cy="75" r="4" fill="currentColor" className="text-primary">
-              <animate attributeName="cx" from="220" to="380" dur="3s" repeatCount="indefinite" />
-              <animate attributeName="cy" from="50" to="100" dur="3s" repeatCount="indefinite" />
+            <circle
+              cx="300"
+              cy="75"
+              r="4"
+              fill="currentColor"
+              className="text-primary"
+            >
+              <animate
+                attributeName="cx"
+                from="220"
+                to="380"
+                dur="3s"
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="cy"
+                from="50"
+                to="100"
+                dur="3s"
+                repeatCount="indefinite"
+              />
             </circle>
 
-            <circle cx="300" cy="100" r="4" fill="currentColor" className="text-primary">
-              <animate attributeName="cx" from="220" to="380" dur="4s" repeatCount="indefinite" />
+            <circle
+              cx="300"
+              cy="100"
+              r="4"
+              fill="currentColor"
+              className="text-primary"
+            >
+              <animate
+                attributeName="cx"
+                from="220"
+                to="380"
+                dur="4s"
+                repeatCount="indefinite"
+              />
             </circle>
 
-            <circle cx="300" cy="125" r="4" fill="currentColor" className="text-primary">
-              <animate attributeName="cx" from="220" to="380" dur="3.5s" repeatCount="indefinite" />
-              <animate attributeName="cy" from="150" to="100" dur="3.5s" repeatCount="indefinite" />
+            <circle
+              cx="300"
+              cy="125"
+              r="4"
+              fill="currentColor"
+              className="text-primary"
+            >
+              <animate
+                attributeName="cx"
+                from="220"
+                to="380"
+                dur="3.5s"
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="cy"
+                from="150"
+                to="100"
+                dur="3.5s"
+                repeatCount="indefinite"
+              />
             </circle>
 
-            <circle cx="500" cy="75" r="4" fill="currentColor" className="text-primary">
-              <animate attributeName="cx" from="420" to="580" dur="3s" repeatCount="indefinite" />
-              <animate attributeName="cy" from="100" to="50" dur="3s" repeatCount="indefinite" />
+            <circle
+              cx="500"
+              cy="75"
+              r="4"
+              fill="currentColor"
+              className="text-primary"
+            >
+              <animate
+                attributeName="cx"
+                from="420"
+                to="580"
+                dur="3s"
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="cy"
+                from="100"
+                to="50"
+                dur="3s"
+                repeatCount="indefinite"
+              />
             </circle>
 
-            <circle cx="500" cy="100" r="4" fill="currentColor" className="text-primary">
-              <animate attributeName="cx" from="420" to="580" dur="2.5s" repeatCount="indefinite" />
+            <circle
+              cx="500"
+              cy="100"
+              r="4"
+              fill="currentColor"
+              className="text-primary"
+            >
+              <animate
+                attributeName="cx"
+                from="420"
+                to="580"
+                dur="2.5s"
+                repeatCount="indefinite"
+              />
             </circle>
 
-            <circle cx="500" cy="125" r="4" fill="currentColor" className="text-primary">
-              <animate attributeName="cx" from="420" to="580" dur="4s" repeatCount="indefinite" />
-              <animate attributeName="cy" from="100" to="150" dur="4s" repeatCount="indefinite" />
+            <circle
+              cx="500"
+              cy="125"
+              r="4"
+              fill="currentColor"
+              className="text-primary"
+            >
+              <animate
+                attributeName="cx"
+                from="420"
+                to="580"
+                dur="4s"
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="cy"
+                from="100"
+                to="150"
+                dur="4s"
+                repeatCount="indefinite"
+              />
             </circle>
           </svg>
         </div>

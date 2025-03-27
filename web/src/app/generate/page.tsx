@@ -13,7 +13,7 @@ const Page = () => {
     setIsLoading(true);
     setError(null);
     setDescription([]);
-  
+
     try {
       console.log("Sending request to backend...");
       const response = await fetch("http://localhost:5000/generate", {
@@ -21,16 +21,16 @@ const Page = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ input }),
       });
-  
+
       console.log("Response received:", response);
-  
+
       if (!response.ok) {
         throw new Error(`Server error: ${response.statusText}`);
       }
-  
-      let responseText = await response.text();
+
+      const responseText = await response.text();
       console.log("Raw response:", responseText);
- 
+
       setDescription([responseText]);
     } catch (error) {
       console.error("Error:", error);
@@ -43,7 +43,9 @@ const Page = () => {
   return (
     <div className="max-w-3xl mx-auto p-6">
       <div className="bg-gray-800 rounded-lg shadow-xl p-6 border border-gray-700">
-        <h2 className="text-2xl font-bold text-white mb-4">Algorithm Suggestion Generator</h2>
+        <h2 className="text-2xl font-bold text-white mb-4">
+          Algorithm Suggestion Generator
+        </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-gray-300 text-sm font-medium mb-2">
@@ -68,7 +70,7 @@ const Page = () => {
           >
             {isLoading ? (
               <>
-                <Loader2 className="animate-spin -ml-1 mr-2 h-5 w-5" />
+                <Loader2 className="animate-spin -ml-1 mr-10 h-5 w-5" />
                 Generating...
               </>
             ) : (
@@ -88,7 +90,9 @@ const Page = () => {
 
         {description.length > 0 && (
           <div className="mt-8 p-6 bg-gray-700 rounded-lg">
-            <h3 className="text-xl font-bold text-white mb-4">Suggested Approach</h3>
+            <h3 className="text-xl font-bold text-white mb-4">
+              Suggested Approach
+            </h3>
             <ul className="list-disc list-inside text-gray-300 space-y-2">
               {description.map((point, index) => (
                 <li key={index}>{point}</li>
