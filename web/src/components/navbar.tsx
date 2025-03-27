@@ -31,7 +31,7 @@ export function Navbar() {
           {/* <Link href="#pricing" className="text-sm font-medium transition-colors hover:text-primary">
             Pricing
           </Link> */}
-          <Link href="#docs" className="text-sm font-medium transition-colors hover:text-primary">
+          <Link href="/documentation" className="text-sm font-medium transition-colors hover:text-primary">
             Documentation
           </Link>
           <Button asChild>
@@ -71,7 +71,7 @@ export function Navbar() {
               Pricing
             </Link>
             <Link
-              href="#docs"
+              href="/documentation"
               className="text-sm font-medium transition-colors hover:text-primary"
               onClick={() => setIsMenuOpen(false)}
             >
