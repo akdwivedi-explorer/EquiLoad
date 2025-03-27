@@ -44,6 +44,13 @@ export function ServerConfigForm() {
     setServerInputs(serverInputs.filter((_, i) => i !== index));
   };
 
+  interface HandleAiButtonClickEvent extends React.MouseEvent<HTMLButtonElement> {}
+
+  const handleAiButtonClcik = (e: HandleAiButtonClickEvent): void => {
+    e.preventDefault();
+    router.push('/generate');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const servers = serverInputs.filter((url) => url.trim() !== "");
@@ -118,11 +125,12 @@ export function ServerConfigForm() {
             </Button>
             <Button
               type="button"
-              className="w-full mt-4"
+              className="w-1/2 mt-4"
               onClick={() => setActiveTab("algorithm")}
             >
               Select Algorithm
             </Button>
+            <Button type="button" className="w-1/2 mt-4 text-left" onClick={handleAiButtonClcik}>Ask to AI</Button>
             {activeTab === "algorithm" && (
               <>
                 <Select

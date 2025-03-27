@@ -3,4 +3,4 @@ npm run start:backend
 for sending 100 requets to the server.
 
 # Send 100 requests with 10 concurrent
-seq 1 100 | xargs -n 1 -P 10 curl -s "http://localhost:3000/balance-request" > /dev/null
+seq 1 1000 | xargs -n 1 -P 10 curl -s "http://localhost:3000/balance-request" > /dev/null
