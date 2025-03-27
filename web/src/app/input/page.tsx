@@ -1,99 +1,64 @@
-"use client";
-
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { ServerConfigForm } from "@/components/server-config-form"
 
 export default function InputPage() {
-  const [serverInputs, setServerInputs] = useState<string[]>([""]);
-  const [strategy, setStrategy] = useState<string>("round-robin");
-  const router = useRouter();
-
-  const handleServerChange = (index: number, value: string) => {
-    const newInputs = [...serverInputs];
-    newInputs[index] = value;
-    setServerInputs(newInputs);
-  };
-
-  const addServerInput = () => {
-    setServerInputs([...serverInputs, ""]);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const servers = serverInputs.filter((url) => url.trim() !== "");
-    if (servers.length === 0) {
-      alert("Please add at least one server");
-      return;
-    }
-
-    try {
-      const response = await fetch("http://localhost:3000/api/configure", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ servers, strategy }),
-      });
-      if (response.ok) {
-        router.push("/dashboard");
-      } else {
-        alert("Failed to configure servers");
-      }
-    } catch (error) {
-      console.error("Error submitting configuration:", error);
-      alert("Error submitting configuration");
-    }
-  };
-
   return (
-    <div className="container mx-auto max-w-2xl p-6">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        Configure Load Balancer
-      </h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-gray-700 font-semibold mb-2">
-            Backend Servers
-          </label>
-          {serverInputs.map((server, index) => (
-            <input
-              key={index}
-              type="text"
-              value={server}
-              onChange={(e) => handleServerChange(index, e.target.value)}
-              placeholder={`Server URL (e.g., http://localhost:400${index})`}
-              className="w-full p-2 mb-2 border rounded-md"
-            />
-          ))}
-          <button
-            type="button"
-            onClick={addServerInput}
-            className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
-          >
-            Add Server
-          </button>
+    <div className="min-h-screen flex flex-col">
+      <main className="flex-1 relative">
+        {/* Background elements */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-br from-primary/20 via-background to-background"></div>
+
+          {/* Animated connection lines */}
+          <div className="absolute inset-0 opacity-10">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse">
+                  <path d="M 100 0 L 0 0 0 100" fill="none" stroke="currentColor" strokeWidth="1" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
+          </div>
+
+          {/* Server nodes */}
+          <div className="absolute top-[10%] left-[10%] w-16 h-16 rounded-full bg-primary/10 border border-primary/20"></div>
+          <div className="absolute top-[20%] right-[15%] w-12 h-12 rounded-full bg-primary/10 border border-primary/20"></div>
+          <div className="absolute bottom-[30%] left-[20%] w-14 h-14 rounded-full bg-primary/10 border border-primary/20"></div>
+          <div className="absolute bottom-[15%] right-[25%] w-10 h-10 rounded-full bg-primary/10 border border-primary/20"></div>
         </div>
 
-        <div>
-          <label className="block text-gray-700 font-semibold mb-2">
-            Load Balancing Strategy
-          </label>
-          <select
-            value={strategy}
-            onChange={(e) => setStrategy(e.target.value)}
-            className="w-full p-2 border rounded-md"
-          >
-            <option value="round-robin">Round Robin</option>
-            <option value="least-connection">Least Connection</option>
-            <option value="ip-hashing">IP Hashing</option>
-          </select>
-        </div>
+        <div className="container px-4 py-12 md:py-24 relative z-10">
+          <div className="flex flex-col items-center text-center mb-8">
+            <div className="inline-block rounded-lg bg-primary/10 border border-primary/20 px-3 py-1 text-sm text-primary mb-4">
+              Configure Your Load Balancer
+            </div>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
+              Set Up Your Load Balancing
+            </h1>
+            <p className="max-w-[700px] text-muted-foreground md:text-lg">
+              Add your backend servers and choose the optimal algorithm to distribute traffic efficiently. Our
+              intelligent system will handle the rest.
+            </p>
+          </div>
 
-        <button
-          type="submit"
-          className="w-full py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-        >
-          Save Configuration
-        </button>
-      </form>
+          <ServerConfigForm />
+        </div>
+      </main>
+
+      <footer className="px-10 w-full border-t py-6">
+        <div className="container flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <div className="h-7 w-7 rounded-full bg-primary flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-sm">EL</span>
+            </div>
+            <span className="font-bold">EquiLoad</span>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            &copy; {new Date().getFullYear()} EquiLoad. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </div>
-  );
+  )
 }
+
