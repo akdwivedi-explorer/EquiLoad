@@ -25,13 +25,29 @@ let backendServers = [
 ];
 let currentStrategy = "round-robin";
 let currentServerIndex = 0;
-const ML_API_URL = "http://localhost:5000/predict"; // Replace with actual ML API endpoint
+const ML_API_URL = "http://127.0.0.1:8000/predict";
+
+const getRandomFloat = (min, max) =>
+  (Math.random() * (max - min) + min).toFixed(2);
+const getRandomInt = (min, max) =>
+  Math.floor(Math.random() * (max - min)) + min;
+
+const generateServerMetrics = (port) => {
+  return {
+    server: `http://localhost:${port}`,
+    cpu: getRandomFloat(1.5, 13),
+    memory: getRandomFloat(70, 90),
+    activeConnections: getRandomInt(1, 10),
+    responseTime: getRandomInt(50, 200),
+  };
+};
 
 const sendUpdates = () => {
   const data = JSON.stringify({
     servers: backendServers.map((server) => ({
       url: server.url,
       connections: server.connections,
+      metrics: generateServerMetrics(new URL(server.url).port),
     })),
     strategy: currentStrategy,
   });
@@ -87,10 +103,19 @@ const ipHash = (clientIp) => {
 
 const getMLPrediction = async () => {
   try {
-    const data = Array(12).fill(1); // Generate array with 12 values all set to 1
-    const response = await axios.post("http://127.0.0.1:8000/predict", {
-      input: data,
-    });
+    const data = backendServers
+      .flatMap((server) => {
+        const metrics = generateServerMetrics(new URL(server.url).port);
+        return [
+          metrics.cpu,
+          metrics.memory,
+          metrics.activeConnections,
+          metrics.responseTime,
+        ];
+      })
+      .slice(0, 12); // Ensure only 12 values are sent
+
+    const response = await axios.post(ML_API_URL, { input: data });
     return response.data.server_index - 1; // Convert 1-based index to 0-based
   } catch (error) {
     console.error("ML Model Error:", error.message);
