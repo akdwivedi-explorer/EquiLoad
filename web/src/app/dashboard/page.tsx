@@ -237,8 +237,7 @@ export default function DashboardPage() {
                     </div>
                     <Progress
                       value={getServerLoadPercentage(server.connections)}
-                      className="h-2"
-                      indicatorClassName={getServerLoadColor(server.connections)}
+                      className={`h-2 ${getServerLoadColor(server.connections)}`}
                     />
                   </div>
                 </CardContent>
