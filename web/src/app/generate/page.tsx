@@ -70,7 +70,7 @@ const Page = () => {
           >
             {isLoading ? (
               <>
-                <Loader2 className="animate-spin -ml-1 mr-10 h-5 w-5" />
+                <Loader2 className="animate-spin -ml-1 mr-2 h-5 w-5" />
                 Generating...
               </>
             ) : (
