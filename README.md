@@ -78,9 +78,9 @@ uvicorn app1:app --reload
 
 ## Screenshots Of Our Website
 
-![Pic 1](https://github.com/user-attachments/assets/df685c8f-5edd-4174-8867-1fc41b8790d2)
-![pic 2](https://github.com/user-attachments/assets/3fb150d9-42c3-4bcb-a04c-4b5dc2dc4b9e)
-![pic 3](https://github.com/user-attachments/assets/0f867d5b-eef1-4f13-b530-a2a35875de25)
-![pic_4](https://github.com/user-attachments/assets/6b73b72f-5d40-49c0-891c-ac5340ebef6b)
-![pic 5](https://github.com/user-attachments/assets/e4637b74-ac37-436a-bdc4-bd18399ed9e1)
-![pic 6](https://github.com/user-attachments/assets/30c448a7-a27f-49dc-99a0-f3be0154293b)
+![WhatsApp Image 2025-03-27 at 11 39 23_87d2a3b3](https://github.com/user-attachments/assets/3f7e46cc-5424-4df2-ac15-15d6403d6d6f)
+![WhatsApp Image 2025-03-27 at 12 48 36_b1c11fe2](https://github.com/user-attachments/assets/8692b5ce-67d5-4315-a825-0e45953704a8)
+![WhatsApp Image 2025-03-27 at 11 39 23_293a156d](https://github.com/user-attachments/assets/48548b93-bf7f-4e22-96a7-784ce104b672)
+![WhatsApp Image 2025-03-27 at 11 39 23_b11c5a3d](https://github.com/user-attachments/assets/d1fc6a0b-748a-4480-8041-bf206c962ae8)
+![WhatsApp Image 2025-03-27 at 12 49 50_5e35f2b2](https://github.com/user-attachments/assets/29afb76e-3cf8-445b-84a1-7ba805cb1f4c)
+![WhatsApp Image 2025-03-27 at 12 50 50_9d83d9f5](https://github.com/user-attachments/assets/12304bb7-919e-4d94-b63e-709e421cd968)
