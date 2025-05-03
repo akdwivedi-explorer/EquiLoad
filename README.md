@@ -78,9 +78,6 @@ uvicorn app1:app --reload
 
 ## Screenshots Of Our Website
 
-![WhatsApp Image 2025-03-27 at 11 39 23_87d2a3b3](https://github.com/user-attachments/assets/3f7e46cc-5424-4df2-ac15-15d6403d6d6f)
 ![WhatsApp Image 2025-03-27 at 12 48 36_b1c11fe2](https://github.com/user-attachments/assets/8692b5ce-67d5-4315-a825-0e45953704a8)
 ![WhatsApp Image 2025-03-27 at 11 39 23_293a156d](https://github.com/user-attachments/assets/48548b93-bf7f-4e22-96a7-784ce104b672)
-![WhatsApp Image 2025-03-27 at 11 39 23_b11c5a3d](https://github.com/user-attachments/assets/d1fc6a0b-748a-4480-8041-bf206c962ae8)
-![WhatsApp Image 2025-03-27 at 12 49 50_5e35f2b2](https://github.com/user-attachments/assets/29afb76e-3cf8-445b-84a1-7ba805cb1f4c)
 ![WhatsApp Image 2025-03-27 at 12 50 50_9d83d9f5](https://github.com/user-attachments/assets/12304bb7-919e-4d94-b63e-709e421cd968)
